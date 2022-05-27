@@ -1,4 +1,10 @@
 package com.example.gifimagegallery.ui.main.viewModels
 
-class SearchGIFsViewModel {
+import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+
+@HiltViewModel
+class SearchGIFsViewModel @Inject constructor() : ViewModel() {
+
 }

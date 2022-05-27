@@ -6,7 +6,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "GIFsData")
-data class Data(
+data class GIFsModel(
     @PrimaryKey
     @NonNull
     @ColumnInfo(name = "id") val id: String,
