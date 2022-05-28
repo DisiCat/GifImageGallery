@@ -1,5 +1,5 @@
 package com.example.gifimagegallery.network.parseModels
 
-data class FixedHeight(
+data class Original(
     val url: String
 )

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">GifImageGallery</string>
+    <string name="edit_hint">Search...</string>
 </resources>

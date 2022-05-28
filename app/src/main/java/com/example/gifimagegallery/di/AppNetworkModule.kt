@@ -23,7 +23,7 @@ object AppNetworkModule {
             .build()
         return Retrofit.Builder()
             .baseUrl(LinkData.BASE_URL)
-            .client(okHttpClient).addConverterFactory(MoshiConverterFactory.create())
+            .client(okHttpClient).addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
     }
 

@@ -5,11 +5,11 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "GIFsData")
-data class GIFsModel(
+@Entity(tableName = "giphyData")
+data class Data(
     @PrimaryKey
     @NonNull
     @ColumnInfo(name = "id") val id: String,
-    @ColumnInfo(name = "url") val images: Images,
-    @ColumnInfo(name = "title") val title: String
+    @ColumnInfo(name = "url") val images: Images?,
+    @ColumnInfo(name = "title") val title: String?
 )
