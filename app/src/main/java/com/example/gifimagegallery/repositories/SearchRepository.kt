@@ -18,6 +18,7 @@ class SearchRepository @Inject constructor(
 ) : ISearchRepository {
     override fun getSearchResult(searchValue: String): Flow<PagingData<GifModel>> {
         val dbQuery = "%${searchValue.replace(' ', '%')}%"
+        val pagingSourceFactory = { database.gifsDao().getGifsBySearch(dbQuery) }
 
         @OptIn(ExperimentalPagingApi::class)
         return Pager(
@@ -26,7 +27,7 @@ class SearchRepository @Inject constructor(
                 enablePlaceholders = false
             ),
             remoteMediator = gifRemoteMediator.create(searchValue = searchValue),
-            pagingSourceFactory = { database.gifsDao().getGifsBySearch(dbQuery) }
+            pagingSourceFactory = pagingSourceFactory
         ).flow
     }
 

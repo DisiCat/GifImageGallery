@@ -54,7 +54,8 @@ class SearchGIFsViewModel @Inject constructor(
             ::Pair
         ).map { (search, scroll) ->
             UiState(
-                query = search.query, lastQueryScrolled = scroll.currentQuery,
+                query = search.query,
+                lastQueryScrolled = scroll.currentQuery,
                 hasNotScrolledForCurrentSearch = search.query != scroll.currentQuery
             )
         }.stateIn(

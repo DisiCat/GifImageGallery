@@ -23,11 +23,16 @@ class GifRemoteMediator @AssistedInject constructor(
     private val gifDatabase: GifDatabase
 ) : RemoteMediator<Int, GifModel>() {
 
+    override suspend fun initialize(): InitializeAction {
+        return InitializeAction.LAUNCH_INITIAL_REFRESH
+    }
+
     override suspend fun load(
         loadType: LoadType,
         state: PagingState<Int, GifModel>
     ): MediatorResult {
-        val page: Int = when (loadType) {
+
+        val page = when (loadType) {
             LoadType.REFRESH -> {
                 val remoteKeys = getRemoteKeyClosestToCurrentPosition(state)
                 remoteKeys?.nextKey?.minus(1) ?: AppDefaultValues.INITIAL_PAGE_NUMBER
@@ -75,15 +80,18 @@ class GifRemoteMediator @AssistedInject constructor(
     }
 
     private suspend fun getRemoteKeyForLastItem(state: PagingState<Int, GifModel>): RemoteKeys? {
-        return state.pages.lastOrNull() { it.data.isNotEmpty() }?.data?.lastOrNull()?.let { gif ->
-            gifDatabase.remoteKeysDao().remoteKeyGifId(gifId = gif.id)
-        }
+        return state.pages.lastOrNull() { it.data.isNotEmpty() }?.data?.lastOrNull()
+            ?.let { gif ->
+                gifDatabase.remoteKeysDao().remoteKeysGifId(gifId = gif.id)
+            }
     }
 
+
     private suspend fun getRemoteKeyForFirstItem(state: PagingState<Int, GifModel>): RemoteKeys? {
-        return state.pages.firstOrNull() { it.data.isNotEmpty() }?.data?.firstOrNull()?.let { gif ->
-            gifDatabase.remoteKeysDao().remoteKeyGifId(gifId = gif.id)
-        }
+        return state.pages.firstOrNull() { it.data.isNotEmpty() }?.data?.firstOrNull()
+            ?.let { gif ->
+                gifDatabase.remoteKeysDao().remoteKeysGifId(gifId = gif.id)
+            }
     }
 
     private suspend fun getRemoteKeyClosestToCurrentPosition(
@@ -91,7 +99,7 @@ class GifRemoteMediator @AssistedInject constructor(
     ): RemoteKeys? {
         return state.anchorPosition?.let { pos ->
             state.closestItemToPosition(pos)?.id?.let { gifId ->
-                gifDatabase.remoteKeysDao().remoteKeyGifId(gifId)
+                gifDatabase.remoteKeysDao().remoteKeysGifId(gifId)
             }
         }
     }
