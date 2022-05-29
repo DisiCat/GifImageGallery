@@ -12,14 +12,18 @@ import com.example.gifimagegallery.databinding.GifItemLayoutBinding
 import com.example.gifimagegallery.entity.GifItemView
 import com.example.gifimagegallery.ui.main.viewModels.UiModel
 
-class GifsAdapter() : PagingDataAdapter<UiModel, GifsAdapter.GifsViewHolder>(UIMODEL_COMPARATOR) {
+class GifsAdapter(
+   private val removeItem : (String?) -> Unit
+) : PagingDataAdapter<UiModel, GifsAdapter.GifsViewHolder>(UIMODEL_COMPARATOR) {
 
 
     class GifsViewHolder(private val itemGifBinding: GifItemLayoutBinding) :
         RecyclerView.ViewHolder(itemGifBinding.root) {
-        fun bind(item: GifItemView) {
+        fun bind(item: GifItemView, removeItem: (String?) -> Unit) {
             Glide.with(itemGifBinding.root).load(item.url).into(itemGifBinding.gifImageView)
-
+            itemGifBinding.removeItemImageVIew.setOnClickListener {
+                removeItem(item.id)
+            }
         }
     }
 
@@ -36,7 +40,7 @@ class GifsAdapter() : PagingDataAdapter<UiModel, GifsAdapter.GifsViewHolder>(UIM
     override fun onBindViewHolder(holder: GifsViewHolder, position: Int) {
         val uiModel = getItem(position)
         if (uiModel is UiModel.GIFItem)
-            holder.bind(uiModel.gif)
+            holder.bind(uiModel.gif,removeItem)
 
     }
 

@@ -2,10 +2,13 @@ package com.example.gifimagegallery.db
 
 import android.content.Context
 import androidx.room.*
+import com.example.gifimagegallery.db.dao.GifDao
+import com.example.gifimagegallery.db.dao.RemoteImageDao
+import com.example.gifimagegallery.db.dao.RemoteKeysDao
 import com.example.gifimagegallery.network.parseModels.GifModel
 
 @Database(
-    entities = [GifModel::class, RemoteKeys::class],
+    entities = [GifModel::class, RemoteKeys::class, RemoteImage::class],
     version = 1,
     exportSchema = false
 )
@@ -13,6 +16,7 @@ import com.example.gifimagegallery.network.parseModels.GifModel
 abstract class GifDatabase : RoomDatabase() {
     abstract fun gifsDao(): GifDao
     abstract fun remoteKeysDao(): RemoteKeysDao
+    abstract fun remoteImageDao(): RemoteImageDao
 
     companion object {
         @Volatile

@@ -1,9 +1,10 @@
 package com.example.gifimagegallery.di
 
 import android.content.Context
-import com.example.gifimagegallery.db.GifDao
+import com.example.gifimagegallery.db.dao.GifDao
 import com.example.gifimagegallery.db.GifDatabase
-import com.example.gifimagegallery.db.RemoteKeysDao
+import com.example.gifimagegallery.db.dao.RemoteImageDao
+import com.example.gifimagegallery.db.dao.RemoteKeysDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,5 +29,10 @@ class DataBaseModule {
     @Provides
     fun provideRemoteKeysDao(gifDataBase: GifDatabase): RemoteKeysDao {
         return gifDataBase.remoteKeysDao()
+    }
+
+    @Provides
+    fun provideRemoteImage(gifDatabase: GifDatabase): RemoteImageDao {
+        return gifDatabase.remoteImageDao()
     }
 }

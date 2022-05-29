@@ -80,6 +80,15 @@ class SearchGIFsViewModel @Inject constructor(
         searchUseCase.getSearchResult(queryString).map { pagingData ->
             pagingData.map { UiModel.GIFItem(it.toGifItemView()) }
         }
+
+    fun deleteGifById(gifId: String?) {
+        viewModelScope.launch {
+
+            gifId?.let {
+                searchUseCase.deleteGifById(gifId)
+            }
+        }
+    }
 }
 
 sealed class UiAction {

@@ -1,4 +1,4 @@
-package com.example.gifimagegallery.db
+package com.example.gifimagegallery.db.dao
 
 import androidx.paging.PagingSource
 import androidx.room.Dao
@@ -14,8 +14,11 @@ interface GifDao {
     suspend fun insertAll(gifs: List<GifModel>)
 
     @Query("SELECT * FROM gifData WHERE title LIKE :searchName")
-    fun getGifsBySearch(searchName : String): PagingSource<Int,GifModel>
+    fun getGifsBySearch(searchName: String): PagingSource<Int, GifModel>
 
-    @Query("DELETE FROM gifData" )
+    @Query("DELETE FROM gifData")
     suspend fun clearGifs()
+
+    @Query("DELETE FROM gifData WHERE id = :gifId")
+    suspend fun deleteGifById(gifId: String)
 }

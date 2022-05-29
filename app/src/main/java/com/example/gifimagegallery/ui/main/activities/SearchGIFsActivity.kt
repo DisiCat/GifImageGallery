@@ -168,7 +168,7 @@ class SearchGIFsActivity : AppCompatActivity() {
     }
 
     private fun initAdapter() {
-        adapter = GifsAdapter()
+        adapter = GifsAdapter(::removeImage)
         header = GifsLoaderStateAdapter { adapter?.retry() }
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         binding.recyclerView.adapter = adapter?.withLoadStateHeaderAndFooter(
@@ -185,5 +185,9 @@ class SearchGIFsActivity : AppCompatActivity() {
                 onQueryChanged(UiAction.Search(query = it.toString()))
             }
         }
+    }
+
+    private fun removeImage(gifId: String?) {
+        viewModel.deleteGifById(gifId)
     }
 }

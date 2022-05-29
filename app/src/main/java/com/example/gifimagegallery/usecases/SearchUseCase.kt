@@ -14,4 +14,10 @@ class SearchUseCase @Inject constructor(
     override fun getSearchResult(query: String): Flow<PagingData<GifModel>>{
         return searchRepository.getSearchResult(query)
     }
+
+    override suspend fun deleteGifById(gifId: String) {
+        searchRepository.deleteImageById(gifId)
+    }
+
+
 }

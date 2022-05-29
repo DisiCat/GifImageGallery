@@ -7,4 +7,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface ISearchUseCase {
     fun getSearchResult(query: String): Flow<PagingData<GifModel>>
+   suspend fun deleteGifById(gifId: String)
 }

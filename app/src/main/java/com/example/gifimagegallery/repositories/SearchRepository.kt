@@ -5,6 +5,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.example.gifimagegallery.db.GifDatabase
+import com.example.gifimagegallery.db.RemoteImage
 import com.example.gifimagegallery.network.parseModels.GifModel
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -33,5 +34,10 @@ class SearchRepository @Inject constructor(
 
     companion object {
         const val NETWORK_PAGE_SIZE = 20
+    }
+
+    override suspend fun deleteImageById(gifId: String) {
+        database.gifsDao().deleteGifById(gifId)
+        database.remoteImageDao().insertRemoveImage(RemoteImage(gifId))
     }
 }

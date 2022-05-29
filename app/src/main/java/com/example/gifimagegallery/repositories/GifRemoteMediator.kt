@@ -55,7 +55,7 @@ class GifRemoteMediator @AssistedInject constructor(
 
         try {
             val response = requester.sendRequest(searchValue, offset)
-            val items = response?.body()?.data ?: emptyList()
+            val items = checkDeletedGifs(response?.body()?.data)
             val endOfPaginationReached = items.isEmpty()
 
             gifDatabase.withTransaction {
@@ -102,6 +102,14 @@ class GifRemoteMediator @AssistedInject constructor(
                 gifDatabase.remoteKeysDao().remoteKeysGifId(gifId)
             }
         }
+    }
+
+    private suspend fun checkDeletedGifs(items: List<GifModel>?): List<GifModel> {
+        val removedImage = gifDatabase.remoteImageDao().getAllRemoteImageId()
+        items?.let {
+            return items.filter { removedImage.none { removeItem -> removeItem.gifId == it.id } }
+        }
+        return emptyList()
     }
 
     @AssistedFactory
