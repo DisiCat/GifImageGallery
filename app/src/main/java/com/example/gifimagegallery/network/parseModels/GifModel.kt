@@ -5,8 +5,8 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "giphyData")
-data class Data(
+@Entity(tableName = "gifData")
+data class GifModel(
     @PrimaryKey
     @NonNull
     @ColumnInfo(name = "id") val id: String,

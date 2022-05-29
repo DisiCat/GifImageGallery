@@ -7,7 +7,8 @@ import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import androidx.paging.cachedIn
 import androidx.paging.map
-import com.example.gifimagegallery.network.parseModels.Data
+import com.example.gifimagegallery.entity.GifItemView
+import com.example.gifimagegallery.extensions.toGifItemView
 import com.example.gifimagegallery.usecases.ISearchUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -76,7 +77,7 @@ class SearchGIFsViewModel @Inject constructor(
 
     private fun searchGIFs(queryString: String): Flow<PagingData<UiModel>> =
         searchUseCase.getSearchResult(queryString).map { pagingData ->
-            pagingData.map { UiModel.GIFItem(it) }
+            pagingData.map { UiModel.GIFItem(it.toGifItemView()) }
         }
 }
 
@@ -92,7 +93,7 @@ data class UiState(
 )
 
 sealed class UiModel {
-    data class GIFItem(val gif: Data) : UiModel()
+    data class GIFItem(val gif: GifItemView) : UiModel()
 }
 
 

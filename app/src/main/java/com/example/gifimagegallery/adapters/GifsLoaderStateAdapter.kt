@@ -3,92 +3,53 @@ package com.example.gifimagegallery.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.paging.LoadState
 import androidx.paging.LoadStateAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.gifimagegallery.R
+import com.example.gifimagegallery.databinding.GifLoadStateFooterViewItemBinding
 import com.example.gifimagegallery.databinding.ItemErrorBinding
 import com.example.gifimagegallery.databinding.ItemProgressBinding
 
-class GifsLoaderStateAdapter():  LoadStateAdapter<GifsLoaderStateAdapter.ItemViewHolder>() {
+class GifsLoaderStateAdapter(
+    private val retry: () -> Unit
+) : LoadStateAdapter<GifsLoaderStateAdapter.GifsLoadStateViewHolder>() {
 
-    override fun getStateViewType(loadState: LoadState) = when (loadState) {
-        is LoadState.NotLoading -> error("Not supported")
-        LoadState.Loading -> PROGRESS
-        is LoadState.Error -> ERROR
-    }
-
-    override fun onBindViewHolder(holder: ItemViewHolder, loadState: LoadState) {
+    override fun onBindViewHolder(holder: GifsLoadStateViewHolder, loadState: LoadState) {
         holder.bind(loadState)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, loadState: LoadState): ItemViewHolder {
-        return when(loadState) {
-            LoadState.Loading -> ProgressViewHolder(LayoutInflater.from(parent.context), parent)
-            is LoadState.Error -> ErrorViewHolder(LayoutInflater.from(parent.context), parent)
-            is LoadState.NotLoading -> error("Not supported")
-        }
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        loadState: LoadState
+    ): GifsLoadStateViewHolder {
+        return GifsLoadStateViewHolder.create(parent, retry)
     }
 
-    private companion object {
-
-        private const val ERROR = 1
-        private const val PROGRESS = 0
-    }
-
-    abstract class ItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-
-        abstract fun bind(loadState: LoadState)
-    }
-
-    class ProgressViewHolder internal constructor(
-        private val binding: ItemProgressBinding
-    ) : ItemViewHolder(binding.root) {
-
-        override fun bind(loadState: LoadState) {
-            // Do nothing
+    class GifsLoadStateViewHolder(
+        private val binding: GifLoadStateFooterViewItemBinding,
+        retry: () -> Unit
+    ) : RecyclerView.ViewHolder(binding.root) {
+        init {
+            binding.retryButton.setOnClickListener { retry.invoke() }
         }
 
-        companion object {
-
-            operator fun invoke(
-                layoutInflater: LayoutInflater,
-                parent: ViewGroup? = null,
-                attachToRoot: Boolean = false
-            ): ProgressViewHolder {
-                return ProgressViewHolder(
-                    ItemProgressBinding.inflate(
-                        layoutInflater,
-                        parent,
-                        attachToRoot
-                    )
-                )
+        fun bind(loadState: LoadState) {
+            if (loadState is LoadState.Error) {
+                binding.errorMsgTextView.text = loadState.error.localizedMessage
             }
-        }
-    }
-
-    class ErrorViewHolder internal constructor(
-        private val binding: ItemErrorBinding
-    ) : ItemViewHolder(binding.root) {
-
-        override fun bind(loadState: LoadState) {
-            require(loadState is LoadState.Error)
-            binding.errorMessage.text = loadState.error.localizedMessage
+            binding.progressBar.isVisible = loadState is LoadState.Loading
+            binding.retryButton.isVisible = loadState is LoadState.Error
+            binding.errorMsgTextView.isVisible = loadState is LoadState.Error
         }
 
         companion object {
-
-            operator fun invoke(
-                layoutInflater: LayoutInflater,
-                parent: ViewGroup? = null,
-                attachToRoot: Boolean = false
-            ): ErrorViewHolder {
-                return ErrorViewHolder(
-                    ItemErrorBinding.inflate(
-                        layoutInflater,
-                        parent,
-                        attachToRoot
-                    )
-                )
+            fun create(parent: ViewGroup, retry: () -> Unit): GifsLoadStateViewHolder {
+                val view = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.gif_load_state_footer_view_item, parent, false)
+                val binding = GifLoadStateFooterViewItemBinding.bind(view)
+                return GifsLoadStateViewHolder(binding, retry)
             }
         }
     }

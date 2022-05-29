@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.gifimagegallery.R
 import com.example.gifimagegallery.databinding.GifItemLayoutBinding
-import com.example.gifimagegallery.network.parseModels.Data
+import com.example.gifimagegallery.entity.GifItemView
 import com.example.gifimagegallery.ui.main.viewModels.UiModel
 
 class GifsAdapter() : PagingDataAdapter<UiModel, GifsAdapter.GifsViewHolder>(UIMODEL_COMPARATOR) {
@@ -17,8 +17,8 @@ class GifsAdapter() : PagingDataAdapter<UiModel, GifsAdapter.GifsViewHolder>(UIM
 
     class GifsViewHolder(private val itemGifBinding: GifItemLayoutBinding) :
         RecyclerView.ViewHolder(itemGifBinding.root) {
-        fun bind(item: Data) {
-            Glide.with(itemGifBinding.root).load(item.images?.original?.url).into(itemGifBinding.gifImageView)
+        fun bind(item: GifItemView) {
+            Glide.with(itemGifBinding.root).load(item.url).into(itemGifBinding.gifImageView)
 
         }
     }

@@ -1,27 +1,36 @@
 package com.example.gifimagegallery.repositories
 
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import com.example.gifimagegallery.network.parseModels.Data
+import com.example.gifimagegallery.db.GifDatabase
+import com.example.gifimagegallery.network.parseModels.GifModel
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class SearchRepository @Inject constructor(
-    private val _GIFsPagingSource : GIFsPagingSource.Factory
+    //private val _GIFsPagingSource: GIFsPagingSource.Factory
+    private val database: GifDatabase,
+    private val gifRemoteMediator: GifRemoteMediator.Factory
 ) : ISearchRepository {
-    override fun getSearchResult(query: String): Flow<PagingData<Data>> {
+    override fun getSearchResult(searchValue: String): Flow<PagingData<GifModel>> {
+        val dbQuery = "%${searchValue.replace(' ', '%')}%"
+
+        @OptIn(ExperimentalPagingApi::class)
         return Pager(
             config = PagingConfig(
                 pageSize = NETWORK_PAGE_SIZE,
                 enablePlaceholders = false
             ),
-            pagingSourceFactory = {_GIFsPagingSource.create(query)}
+            remoteMediator = gifRemoteMediator.create(searchValue = searchValue),
+            pagingSourceFactory = { database.gifsDao().getGifsBySearch(dbQuery) }
         ).flow
     }
-    companion object{
-        const val NETWORK_PAGE_SIZE = 25
+
+    companion object {
+        const val NETWORK_PAGE_SIZE = 20
     }
 }

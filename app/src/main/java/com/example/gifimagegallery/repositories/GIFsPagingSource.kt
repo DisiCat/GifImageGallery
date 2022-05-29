@@ -4,7 +4,7 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.gifimagegallery.constants.AppDefaultValues
 import com.example.gifimagegallery.constants.AppDefaultValues.INITIAL_PAGE_NUMBER
-import com.example.gifimagegallery.network.parseModels.Data
+import com.example.gifimagegallery.network.parseModels.GifModel
 import com.example.gifimagegallery.requesters.IGIFsRequester
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -14,14 +14,14 @@ import retrofit2.HttpException
 class GIFsPagingSource @AssistedInject constructor(
     private val requester: IGIFsRequester,
     @Assisted("searchValue") private val searchValue: String
-) : PagingSource<Int, Data>() {
-    override fun getRefreshKey(state: PagingState<Int, Data>): Int? {
+) : PagingSource<Int, GifModel>() {
+    override fun getRefreshKey(state: PagingState<Int, GifModel>): Int? {
         val anchorPosition = state.anchorPosition ?: return null
         val anchorPage = state.closestPageToPosition(anchorPosition) ?: return null
         return anchorPage.prevKey?.plus(1) ?: anchorPage.nextKey?.minus(1)
     }
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Data> {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, GifModel> {
         if (searchValue.isEmpty()) {
             return LoadResult.Page(emptyList(), prevKey = null, nextKey = null)
         }

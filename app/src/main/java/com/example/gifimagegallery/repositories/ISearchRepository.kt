@@ -1,9 +1,9 @@
 package com.example.gifimagegallery.repositories
 
 import androidx.paging.PagingData
-import com.example.gifimagegallery.network.parseModels.Data
+import com.example.gifimagegallery.network.parseModels.GifModel
 import kotlinx.coroutines.flow.Flow
 
 interface ISearchRepository {
-    fun getSearchResult(query : String) : Flow<PagingData<Data>>
+    fun getSearchResult(searchValue: String): Flow<PagingData<GifModel>>
 }

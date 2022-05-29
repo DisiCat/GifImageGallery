@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.inputmethod.EditorInfo
+import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -15,6 +17,8 @@ import com.example.gifimagegallery.R
 import com.example.gifimagegallery.adapters.GifsAdapter
 import com.example.gifimagegallery.adapters.GifsLoaderStateAdapter
 import com.example.gifimagegallery.databinding.ActivitySearchGifsBinding
+import com.example.gifimagegallery.enums.RemotePresentationState
+import com.example.gifimagegallery.extensions.asRemotePresentationState
 import com.example.gifimagegallery.ui.main.viewModels.SearchGIFsViewModel
 import com.example.gifimagegallery.ui.main.viewModels.UiAction
 import com.example.gifimagegallery.ui.main.viewModels.UiModel
@@ -28,12 +32,14 @@ class SearchGIFsActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySearchGifsBinding
     private val viewModel by lazy { ViewModelProvider(this).get(SearchGIFsViewModel::class.java) }
     private var adapter: GifsAdapter? = null
+    private var header: GifsLoaderStateAdapter? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_search_gifs)
         binding.lifecycleOwner = this
 
         //
+        initAdapter()
         bindState(
             uiState = viewModel.state,
             pagingData = viewModel.pagingDataFlow,
@@ -46,7 +52,6 @@ class SearchGIFsActivity : AppCompatActivity() {
         pagingData: Flow<PagingData<UiModel>>,
         uiActions: (UiAction) -> Unit
     ) {
-        initAdapter()
         bindSearch(
             uiState = uiState,
             onQueryChanged = uiActions
@@ -68,22 +73,26 @@ class SearchGIFsActivity : AppCompatActivity() {
         pagingData: Flow<PagingData<UiModel>>,
         onScrollChanged: (UiAction) -> Unit
     ) {
+        binding.retryButton.setOnClickListener { adapter?.retry() }
         binding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 if (dy != 0) onScrollChanged(UiAction.Scroll(currentQuery = uiState.value.query))
             }
         })
         val notLoading = gifsListAdapter.loadStateFlow
-            .distinctUntilChangedBy { it.refresh }
-            .map { it.refresh is LoadState.NotLoading }
+            .asRemotePresentationState()
+            .map { it == RemotePresentationState.PRESENTED }
+
         val hasNotScrolledForCurrentSearch = uiState
             .map { it.hasNotScrolledForCurrentSearch }
             .distinctUntilChanged()
+
         val shouldScrollToTop = combine(
             notLoading,
             hasNotScrolledForCurrentSearch,
             Boolean::and
-        ).distinctUntilChanged()
+        )
+            .distinctUntilChanged()
 
         lifecycleScope.launch {
             pagingData.collectLatest {
@@ -95,6 +104,41 @@ class SearchGIFsActivity : AppCompatActivity() {
             shouldScrollToTop.collect { shouldScroll ->
                 if (shouldScroll) binding.recyclerView.scrollToPosition(0)
             }
+        }
+
+        lifecycleScope.launch {
+            adapter?.loadStateFlow?.collect { loadState ->
+                header?.loadState =
+                    loadState.mediator
+                        ?.refresh
+                        ?.takeIf { it is LoadState.Error && adapter?.let { adapter -> adapter.itemCount > 0 } ?: false }
+                        ?: loadState.prepend
+                val isListEmpty =
+                    loadState.refresh is LoadState.NotLoading && adapter?.itemCount == 0
+
+                binding.emptyListTextView.isVisible = isListEmpty
+
+                binding.recyclerView.isVisible =
+                    loadState.source.refresh is LoadState.NotLoading || loadState.mediator?.refresh is LoadState.NotLoading
+
+                binding.progressBar.isVisible = loadState.mediator?.refresh is LoadState.Loading
+
+                binding.retryButton.isVisible =
+                    loadState.mediator?.refresh is LoadState.Error && adapter?.itemCount == 0
+
+                val errorState = loadState.source.append as? LoadState.Error
+                    ?: loadState.source.prepend as? LoadState.Error
+                    ?: loadState.append as? LoadState.Error
+                    ?: loadState.prepend as? LoadState.Error
+                errorState?.let {
+                    Toast.makeText(
+                        this@SearchGIFsActivity,
+                        "\uD83D\uDE28 Wooops ${it.error}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+
         }
     }
 
@@ -125,10 +169,11 @@ class SearchGIFsActivity : AppCompatActivity() {
 
     private fun initAdapter() {
         adapter = GifsAdapter()
+        header = GifsLoaderStateAdapter { adapter?.retry() }
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         binding.recyclerView.adapter = adapter?.withLoadStateHeaderAndFooter(
-            header = GifsLoaderStateAdapter(),
-            footer = GifsLoaderStateAdapter()
+            header = header ?: GifsLoaderStateAdapter { adapter?.retry() },
+            footer = GifsLoaderStateAdapter { adapter?.retry() }
 
         )
     }
