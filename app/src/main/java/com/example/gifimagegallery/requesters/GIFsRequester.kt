@@ -15,10 +15,14 @@ class GIFsRequester @Inject constructor(
 ) : IGIFsRequester {
     override suspend fun sendRequest(searchKey: String, offset: Int): Response<DataModel>? {
 
-     val job =   withContext(Dispatchers.IO) {
-            val url = "https://api.giphy.com/v1/gifs/search?api_key=YGHnKKBGSydS6nSt6WA\n" +
-                    "oUcICWwmgCfvL&amp;q=${searchKey}&amp;limit=${AppDefaultValues.DEFAULT_ITEMS_LOAD}&amp;offset=${offset}&amp;rating=g&amp;lang=en"
-            return@withContext restApiService.getGIFs(url)
+        val job = withContext(Dispatchers.IO) {
+            return@withContext restApiService.getGIFs(
+                q = searchKey,
+                limit = AppDefaultValues.LIMIT_ITEM_LOAD,
+                offset = offset,
+                rating = AppDefaultValues.RATING_G,
+                lang = AppDefaultValues.DEFAULT_LANG
+            )
         }
         return job
     }
