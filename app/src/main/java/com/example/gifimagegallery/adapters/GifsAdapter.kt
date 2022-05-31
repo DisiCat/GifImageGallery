@@ -2,12 +2,10 @@ package com.example.gifimagegallery.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.gifimagegallery.R
 import com.example.gifimagegallery.databinding.GifItemLayoutBinding
 import com.example.gifimagegallery.entity.GifItemView
 import com.example.gifimagegallery.ui.main.viewModels.UiModel
@@ -29,9 +27,8 @@ class GifsAdapter(
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = GifsViewHolder(
-        DataBindingUtil.inflate(
+        GifItemLayoutBinding.inflate(
             LayoutInflater.from(parent.context),
-            R.layout.gif_item_layout,
             parent,
             false
         )

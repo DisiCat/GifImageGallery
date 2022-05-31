@@ -1,19 +1,17 @@
 package com.example.gifimagegallery.ui.main.activities
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.gifimagegallery.R
 import com.example.gifimagegallery.adapters.GifsAdapter
 import com.example.gifimagegallery.adapters.GifsLoaderStateAdapter
 import com.example.gifimagegallery.databinding.ActivitySearchGifsBinding
@@ -35,8 +33,10 @@ class SearchGIFsActivity : AppCompatActivity() {
     private var header: GifsLoaderStateAdapter? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_search_gifs)
-        binding.lifecycleOwner = this
+        binding = ActivitySearchGifsBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
+
 
         //
         initAdapter()
